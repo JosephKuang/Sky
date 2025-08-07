@@ -1,0 +1,25 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+
+
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+application-dev.yml
+
