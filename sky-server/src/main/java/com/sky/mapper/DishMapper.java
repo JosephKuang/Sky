@@ -6,6 +6,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.entity.Employee;
+import com.sky.entity.SetmealDish;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Insert;
@@ -38,4 +39,10 @@ public interface DishMapper {
 
 
     Page<DishVO> selectByPage(DishPageQueryDTO dishPageQueryDTO);
+
+    @Select("select * from dish where id = #{id}")
+    Dish getById(Long id);
+
+
+    void deleteById(List<Long> ids);
 }

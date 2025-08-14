@@ -6,10 +6,14 @@ import com.sky.result.PageResult;
 import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 public interface DishService {
 
     void saveWithFlavour(DishDTO dishDTO);
 
     PageResult selectByPage(DishPageQueryDTO dishPageQueryDTO);
+
+    void delete(List<Long> ids);
 }
