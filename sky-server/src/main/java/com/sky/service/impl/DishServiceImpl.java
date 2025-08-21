@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -24,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -53,24 +57,22 @@ public class DishServiceImpl implements DishService {
         Long dishId = dish.getId();
         //向口味表插入n条数据
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
-        if(dishFlavors!=null&&dishFlavors.size()>0){
+        if (dishFlavors != null && dishFlavors.size() > 0) {
             dishFlavors.forEach(dishFlavor -> {
                 dishFlavor.setDishId(dishId);
             });
-            dishMapper2.insertBatch(dishFlavors);
+            dishFlavorMapper.insertBatch(dishFlavors);
         }
 
 
-
-
-        dishMapper2.insertBatch(dishFlavors);
+        dishFlavorMapper.insertBatch(dishFlavors);
     }
 
     @Override
     public PageResult selectByPage(DishPageQueryDTO dishPageQueryDTO) {
-        PageHelper.startPage(dishPageQueryDTO.getPage(),dishPageQueryDTO.getPageSize());
+        PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<DishVO> page = dishMapper1.selectByPage(dishPageQueryDTO);
-        return new PageResult(page.getTotal(),page.getResult());
+        return new PageResult(page.getTotal(), page.getResult());
 
 
     }
@@ -80,16 +82,16 @@ public class DishServiceImpl implements DishService {
     public void delete(List<Long> ids) {
         //判断能否删除- 起售中的菜品不能删除
         for (Long id : ids) {
-           Dish dish = dishMapper1.getById(id);
-           if(dish.getStatus() == StatusConstant.ENABLE){
-               //当前菜品处于起售中，不能删除
-               throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
-           }
+            Dish dish = dishMapper1.getById(id);
+            if (dish.getStatus() == StatusConstant.ENABLE) {
+                //当前菜品处于起售中，不能删除
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
 
         }
         //判断能否删除- 被套餐关联的菜品不能删除
         List<Long> setmealIds = setmealDishMapper.getSetmealById(ids);
-        if(setmealIds!=null&&setmealIds.size()>0){
+        if (setmealIds != null && setmealIds.size() > 0) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
@@ -97,5 +99,47 @@ public class DishServiceImpl implements DishService {
         dishMapper.deleteById(ids);
         //删除菜品后，关联的口味数据也要删除
         dishFlavorMapper.deleteByDishId(ids);
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+    }
+
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        DishVO dishVO = new DishVO();
+        Dish dish = dishMapper.getById(id);
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishid(id);
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(dishFlavors);
+
+        return dishVO;
+    }
+
+    /**
+     * 修改菜品
+     * @param dishDTO 
+     */
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+
+        dishFlavorMapper.deleteByDishId(Collections.singletonList(dish.getId()));
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+        if (dishFlavors != null && !dishFlavors.isEmpty()) {
+            dishFlavors.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dish.getId());
+            });
+            dishFlavorMapper.insertBatch(dishFlavors);
+
+        }
+
     }
 }

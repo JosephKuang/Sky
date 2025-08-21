@@ -35,7 +35,6 @@ public interface DishMapper {
 
 
 
-    void insertBatch(List<DishFlavor> dishFlavors);
 
 
     Page<DishVO> selectByPage(DishPageQueryDTO dishPageQueryDTO);
@@ -45,4 +44,7 @@ public interface DishMapper {
 
 
     void deleteById(List<Long> ids);
+
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
 }
