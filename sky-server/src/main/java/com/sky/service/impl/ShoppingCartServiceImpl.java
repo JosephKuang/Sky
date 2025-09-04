@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,12 +46,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setUserId(userId);
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
         //如果已经存在，只需要将数量加一
-        if(list !=null && !list.isEmpty() && list.get(0).getDishFlavor().equals(shoppingCartDTO.getDishFlavor() ) ){
-            ShoppingCart Cart = list.get(0);
-            Cart.setNumber(Cart.getNumber()+1);
-            shoppingCartMapper.updateNumberById(Cart);
+        if (list != null && !list.isEmpty()) {
+            ShoppingCart cart = list.get(0);
+            String flavor = cart.getDishFlavor();
+            if ((flavor == null && shoppingCartDTO.getDishFlavor() == null)
+                    || (flavor != null && flavor.equals(shoppingCartDTO.getDishFlavor()))) {
+                cart.setNumber(cart.getNumber() + 1);
+                shoppingCartMapper.updateNumberById(cart);
+            }
         }
-
         //如果不存在，需要插入一条购物车数据
         else{
             if(shoppingCartDTO.getDishId() != null){

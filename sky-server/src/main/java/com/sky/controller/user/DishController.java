@@ -51,7 +51,7 @@ public class DishController {
         //不存在，将菜品数据缓存到redis中
         System.out.println(list);
 
-         redisTemplate.opsForValue().set(key,list);
+
 
         return Result.success(list);
 
