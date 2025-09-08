@@ -1,5 +1,6 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.ISelect;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -44,4 +45,6 @@ public interface OrderMapper {
 
     @Select("SELECT * FROM orders WHERE status = #{status} AND order_time < #{orderTime}")
     List<Orders> getByStatusAndOrderTimeLT(Integer status,LocalDateTime orderTime);
+
+
 }
