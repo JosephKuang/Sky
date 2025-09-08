@@ -23,7 +23,7 @@ public class OrderTask {
     /**
      * 处理超时订单的状态
      */
-    @Scheduled(cron = "0 * * * * ? ")
+//    @Scheduled(cron = "0 * * * * ? ")
     public void processTimeOutTask(){
         log.info("定时处理超时订单");
         //查询未支付订单，判断订单时间是否小于当前时间减15min
@@ -43,7 +43,7 @@ public class OrderTask {
     /**
      * 处理一直派送中订单的状态
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
     public void processDeliveryOrder(){
         log.info("定时处理处于派送中的订单");
         LocalDateTime time = LocalDateTime.now().plusMinutes(-60);
