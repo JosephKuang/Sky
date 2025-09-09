@@ -1,9 +1,11 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -134,5 +137,24 @@ public class ReportServiceImpl implements ReportService {
         return new OrderReportVO(StringUtils.join(dateList, ","),
                 StringUtils.join(orderCountList, ","),
                 StringUtils.join(validOrderCountList,","),totalOrderCount,validOrderCount,orderCompletionRate);
+    }
+
+    @Override
+    public SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end) {
+        List<String> nameList = new ArrayList<>();
+        List<Object> numberList = new ArrayList<>();
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end,LocalTime.MAX);
+        Map map = new HashMap();
+        map.put("endTime",endTime);
+        map.put("beginTime",beginTime);
+        List<GoodsSalesDTO> top10List  = reportMapper.getTop10(map);
+        //查出时间段内有哪些订单 select id from orders where order_time > beginTime and order_id < endTime
+
+        //根据订单id把订单明细按名字分组，将每组的number相加，降序查出前十的名字和数量
+
+        List<String> names = top10List.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numbers = top10List.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        return new SalesTop10ReportVO(StringUtils.join(names,","),StringUtils.join(numbers,","));
     }
 }
