@@ -14,4 +14,7 @@ public interface ReportMapper {
             "  AND order_time >= #{current}\n" +
             "  AND order_time < DATE_ADD(#{current}, INTERVAL 1 DAY);")
     Double getTurnoverStaticsByDate(LocalDate current);
+
+
+
 }

@@ -7,6 +7,10 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import static com.sky.enumeration.OperationType.INSERT;
 
 @Mapper
@@ -19,4 +23,9 @@ public interface UserMapper {
 
     @Select("select * from user where id = #{userId}")
     User getById(Long userId);
+
+
+    int getUserCount(Map map);
+
+    int getNewUserCount(Map map);
 }
