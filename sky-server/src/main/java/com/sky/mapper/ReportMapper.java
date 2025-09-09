@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Mapper
 public interface ReportMapper {
@@ -15,6 +17,10 @@ public interface ReportMapper {
             "  AND order_time < DATE_ADD(#{current}, INTERVAL 1 DAY);")
     Double getTurnoverStaticsByDate(LocalDate current);
 
+
+    int getVaildOrderCount(Map map);
+
+    int getorderCount(Map map);
 
 
 }
